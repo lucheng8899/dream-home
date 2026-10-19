@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#1c1a17" />
+    <link rel="icon" href="data:," />
+    <title>梦想之家 · 3D 装修工作室</title>
+    <script type="module" crossorigin src="./assets/index-BKxjS33u.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-5mjakAVy.css">
+  </head>
+  <body>
+    <main id="app">
+      <canvas id="game-canvas" aria-label="3D 装修工作室画布"></canvas>
+
+      <div id="hud">
+        <!-- 左上：客户委托单 -->
+        <section id="order-sheet" class="paper-panel" aria-label="客户委托单">
+          <header class="order-head">
+            <div class="order-head-main">
+              <span class="order-kicker">客户委托单</span>
+              <h2 id="order-title" class="order-title">—</h2>
+              <p id="order-client" class="order-client">—</p>
+            </div>
+            <button
+              id="order-collapse"
+              class="icon-btn order-collapse-btn"
+              type="button"
+              aria-label="展开或收起委托单"
+              aria-expanded="true"
+            >
+              <span class="chev" aria-hidden="true"></span>
+            </button>
+          </header>
+          <p id="order-quick" class="order-quick" aria-hidden="true"></p>
+          <div id="order-body" class="order-body">
+            <div class="order-tags">
+              <span id="order-style-badge" class="style-badge">—</span>
+              <span id="order-stars" class="star-target">—</span>
+            </div>
+            <div id="order-free-badge" class="free-badge hidden">自由装修 · 无预算限制</div>
+            <div id="budget-block" class="budget-block">
+              <div class="budget-row">
+                <span class="budget-label">预算</span>
+                <strong id="budget-text" class="budget-text">—</strong>
+              </div>
+              <div class="budget-bar" role="progressbar" aria-label="预算使用">
+                <div id="budget-fill" class="budget-fill"></div>
+              </div>
+            </div>
+            <p id="order-empty" class="order-empty hidden">
+              暂无进行中的订单。点「换一单」去接单处看看吧。
+            </p>
+            <div class="req-block">
+              <h3 class="req-heading">
+                需求清单 <span id="req-count" class="req-count"></span>
+              </h3>
+              <ul id="req-list" class="req-list"></ul>
+            </div>
+            <div class="order-actions">
+              <button id="deliver-btn" class="btn btn-primary order-deliver" type="button">
+                交付验收
+              </button>
+              <button id="restart-btn" class="btn" type="button">重新布置</button>
+              <button id="swap-btn" class="btn" type="button">换一单</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- 右上：金币 / 模式 / 快捷开关 -->
+        <div id="top-right" class="top-right">
+          <div id="money-pill" class="money-pill" title="当前金币">
+            <span class="coin" aria-hidden="true">¥</span>
+            <strong id="money-value" class="money-value">0</strong>
+          </div>
+          <div id="mode-badge" class="mode-badge" title="当前模式（Tab 切换）">
+            <span id="mode-label">🚶 漫游</span>
+            <kbd>Tab</kbd>
+          </div>
+          <button id="day-btn" class="icon-btn top-icon" type="button" title="切换昼夜" aria-label="切换昼夜">
+            ☀️
+          </button>
+          <button
+            id="free-btn"
+            class="icon-btn top-icon"
+            type="button"
+            title="切换自由 / 订单模式"
+            aria-label="切换自由或订单模式"
+          >
+            📋
+          </button>
+        </div>
+
+        <!-- 底部中央：工具轨 -->
+        <nav id="toolbar" class="toolbar" aria-label="工具栏">
+          <button class="tool-btn" type="button" data-tool="select" title="选择工具（V）">
+            <span class="tool-ico" aria-hidden="true">🖱️</span>
+            <span class="tool-name">选择</span>
+            <kbd class="tool-key">V</kbd>
+          </button>
+          <button class="tool-btn" type="button" data-tool="paint" title="墙漆工具（B）">
+            <span class="tool-ico" aria-hidden="true">🖌️</span>
+            <span class="tool-name">墙漆</span>
+            <kbd class="tool-key">B</kbd>
+          </button>
+          <button class="tool-btn" type="button" data-tool="floor" title="地板工具（F）">
+            <span class="tool-ico" aria-hidden="true">▦</span>
+            <span class="tool-name">地板</span>
+            <kbd class="tool-key">F</kbd>
+          </button>
+          <button class="tool-btn" type="button" data-tool="delete" title="删除工具（X）">
+            <span class="tool-ico" aria-hidden="true">🗑️</span>
+            <span class="tool-name">删除</span>
+            <kbd class="tool-key">X</kbd>
+          </button>
+          <span class="tool-sep" aria-hidden="true"></span>
+          <button
+            id="catalog-btn"
+            class="tool-btn tool-btn-wide"
+            type="button"
+            title="打开 / 关闭材料目录"
+            aria-expanded="false"
+          >
+            <span class="tool-ico" aria-hidden="true">📖</span>
+            <span class="tool-name">目录</span>
+          </button>
+          <button id="mode-btn" class="tool-btn tool-btn-wide" type="button" title="切换模式（Tab）">
+            <span id="mode-btn-label" class="tool-name">🚶 漫游</span>
+            <kbd class="tool-key tool-key-inline">Tab</kbd>
+          </button>
+        </nav>
+
+        <!-- 右侧：材料目录 -->
+        <aside id="catalog" class="catalog" aria-label="材料目录" aria-hidden="true">
+          <header class="catalog-head">
+            <h2 class="catalog-title">材料目录</h2>
+            <button id="catalog-close" class="icon-btn" type="button" aria-label="关闭目录">✕</button>
+          </header>
+          <div id="catalog-tabs" class="catalog-tabs" role="tablist" aria-label="目录分类"></div>
+          <div id="catalog-body" class="catalog-body"></div>
+        </aside>
+
+        <!-- 左下：提示 + 已选中 -->
+        <div id="bottom-left" class="bottom-left">
+          <p id="hint-line" class="hint-line">—</p>
+          <div id="selected-chip" class="selected-chip hidden">
+            <span id="selected-text" class="selected-text">已选中：—</span>
+            <button id="delete-btn" class="btn btn-danger-sm" type="button">删除</button>
+          </div>
+        </div>
+
+        <!-- 顶部中央：Toast -->
+        <div id="toast" class="toast toast-info hidden" role="status" aria-live="polite"></div>
+
+        <!-- 交付结算弹窗 -->
+        <div id="delivery-modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="交付结算">
+          <div class="modal-card delivery-card">
+            <p class="modal-eyebrow">交付验收</p>
+            <div id="delivery-stars" class="big-stars" aria-label="评分"></div>
+            <p id="delivery-message" class="delivery-message"></p>
+            <ul id="delivery-lines" class="delivery-lines"></ul>
+            <div id="delivery-budget" class="delivery-budget"></div>
+            <p class="delivery-earned">
+              本次报酬 <strong id="delivery-earned" class="earned-num">¥0</strong>
+            </p>
+            <button id="delivery-continue" class="btn btn-primary btn-big" type="button">继续</button>
+          </div>
+        </div>
+
+        <!-- 接单弹窗 -->
+        <div id="order-modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="接单处">
+          <div class="modal-card order-picker-card">
+            <header class="modal-head">
+              <div>
+                <p class="modal-eyebrow">接单处</p>
+                <h2 class="modal-title">选择新的委托</h2>
+              </div>
+              <button id="order-modal-close" class="icon-btn" type="button" aria-label="关闭接单弹窗">✕</button>
+            </header>
+            <div id="order-list" class="order-list"></div>
+          </div>
+        </div>
+
+        <!-- 开始遮罩 -->
+        <div id="start-overlay" class="start-overlay">
+          <div class="start-card paper-panel">
+            <p class="start-eyebrow">3D 装修工作室</p>
+            <h1 class="start-title">梦想之家</h1>
+            <p class="start-desc">
+              接下客户委托，在光影真实的公寓里刷墙、铺地、挑选家具——盯紧预算与需求清单，交付一个让客户满意的新家。
+            </p>
+            <button id="start-btn" class="btn btn-primary btn-big start-btn" type="button">进入工作室</button>
+            <p class="start-hint">WASD 移动 · 点击画布漫游 · Tab 切换模式 · V / B / F / X 工具</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 触控（仅 coarse 指针显示） -->
+      <div id="touch-controls" aria-hidden="true">
+        <div id="touch-stick">
+          <div id="touch-knob"></div>
+        </div>
+        <button id="dash-button" type="button">放置</button>
+      </div>
+    </main>
+  </body>
+</html>
